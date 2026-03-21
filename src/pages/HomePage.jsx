@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, Button, Container, Grid, Paper, Stack } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import ExploreIcon from '@mui/icons-material/Explore';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import ArchitectureIcon from '@mui/icons-material/Architecture';
@@ -8,9 +8,14 @@ import ChairIcon from '@mui/icons-material/Chair';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { tokens } from '../shared/theme/tokens';
 import { AppShell } from '../shared/layout/AppShell';
+import { useSharedAuthState } from '../shared/hooks/useSharedAuthState';
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const { isAuthed, isLoading } = useSharedAuthState();
+
+  if (isLoading) return null;
+  if (isAuthed) return <Navigate to="dashboard" replace />;
 
   return (
     <AppShell>
@@ -35,26 +40,46 @@ export default function HomePage() {
             <Typography variant="h4" color="text.secondary" sx={{ mb: 5, fontWeight: 400, lineHeight: 1.6 }}>
               建築・インテリアの知識と設計思考を、<br />ストーリーと冒険を通して学ぶ。
             </Typography>
-            
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
-              <Button 
-                variant="contained" 
-                size="large" 
-                startIcon={<ExploreIcon />}
-                onClick={() => navigate('/dashboard')}
-                sx={{ px: 4, py: 1.5, fontSize: '1.1rem' }}
-              >
-                冒険を始める
-              </Button>
-              <Button 
-                variant="outlined" 
-                size="large"
-                onClick={() => navigate('/dashboard')}
-                sx={{ px: 4, py: 1.5, fontSize: '1.1rem', color: '#fff', borderColor: tokens.colors.border.medium }}
-              >
-                ログインしてダッシュボードへ
-              </Button>
-            </Stack>
+            {isAuthed ? (
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
+                <Button 
+                  variant="contained" 
+                  size="large" 
+                  startIcon={<ExploreIcon />}
+                  onClick={() => navigate('/dashboard')}
+                  sx={{ px: 4, py: 1.5, fontSize: '1.1rem' }}
+                >
+                  冒険を続ける
+                </Button>
+                <Button 
+                  variant="outlined" 
+                  size="large"
+                  onClick={() => navigate('/dashboard')}
+                  sx={{ px: 4, py: 1.5, fontSize: '1.1rem', color: '#fff', borderColor: tokens.colors.border.medium }}
+                >
+                  ダッシュボードへ
+                </Button>
+              </Stack>
+            ) : (
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
+                <Button 
+                  variant="contained" 
+                  size="large" 
+                  onClick={() => { window.location.assign('/login?return_to=/app/quest/dashboard'); }}
+                  sx={{ px: 4, py: 1.5, fontSize: '1.1rem' }}
+                >
+                  ログイン
+                </Button>
+                <Button 
+                  variant="outlined" 
+                  size="large"
+                  onClick={() => { window.location.assign('/signup?return_to=/app/quest/dashboard'); }}
+                  sx={{ px: 4, py: 1.5, fontSize: '1.1rem', color: '#fff', borderColor: tokens.colors.border.medium }}
+                >
+                  アカウント作成
+                </Button>
+              </Stack>
+            )}
           </Container>
         </Box>
 
